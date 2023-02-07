@@ -1,9 +1,16 @@
 import 'package:find_product/pages/product_details_page.dart';
 import 'package:find_product/pages/search_page.dart';
+import 'package:find_product/providers/search_response_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => SearchResponseProvider()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -20,8 +27,5 @@ class MyApp extends StatelessWidget {
         ProductDetailsPage.routeName: (context) => ProductDetailsPage()
       },
     );
-
   }
 }
-
-

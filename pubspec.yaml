@@ -38,6 +38,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   provider:
   http:
+  google_fonts: ^4.0.3
+  google_language_fonts: ^2.0.0
+  cached_network_image:
 
 dev_dependencies:
   flutter_test:
