@@ -6,9 +6,16 @@ import 'package:http/http.dart' as http;
 
 class SearchResponseProvider extends ChangeNotifier{
   SearchResponse? searchResponse;
+  String? searchData;
   bool get hasDataLoaded => searchResponse != null;
+
+  void setSearchData(String text) {
+    searchData = text;
+    getSearchData();
+  }
+
   Future<void> getSearchData() async{
-    final urlString = "https://panel.supplyline.network/api/product/search-suggestions/?limit=10&offset=10&search=rice";
+    final urlString = "https://panel.supplyline.network/api/product/search-suggestions/?limit=10&search=$searchData";
     try{
       final response = await http.get(Uri.parse(urlString));
       final map = jsonDecode(response.body);
@@ -22,5 +29,7 @@ class SearchResponseProvider extends ChangeNotifier{
       print(error.toString());
     }
   }
+
+
 
 }

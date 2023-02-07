@@ -1,3 +1,4 @@
+import 'package:find_product/models/search_response.dart';
 import 'package:find_product/providers/search_response_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_language_fonts/google_language_fonts.dart';
@@ -17,48 +18,80 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   late SearchResponseProvider searchResponseProvider;
+  final TextEditingController _searchController = TextEditingController();
+  bool hasDataSearched = false;
 
   @override
   void didChangeDependencies() {
     searchResponseProvider =
         Provider.of<SearchResponseProvider>(context, listen: true);
-    searchResponseProvider.getSearchData();
     super.didChangeDependencies();
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final productList =
-        searchResponseProvider.searchResponse?.data?.products?.results;
     return Scaffold(
-      backgroundColor: Color(0xFFE5E5E5),
+      backgroundColor: const Color(0xFFE5E5E5),
       body: SingleChildScrollView(
         child: Column(
           children: [
             buildSectionSearchBar(context),
-            SizedBox(height: 30,),
-            searchResponseProvider.hasDataLoaded ? Padding(
-              padding: const EdgeInsets.only(left: 17, right: 17, top: 8, bottom: 8),
-              child: GridView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                mainAxisExtent: 300,
-               mainAxisSpacing: 5,
-                crossAxisSpacing: 10),
-                itemCount: productList!.length,
-                itemBuilder: (context, index) {
-                  return ProductItemView(item: productList[index],);
-                },
-              ),
-            ): Center(child: CircularProgressIndicator(),),
+            const SizedBox(
+              height: 30,
+            ),
+            searchResponseProvider.hasDataLoaded
+                ? buildSectionProductView()
+                : hasDataSearched
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : const Text(""),
           ],
         ),
       ),
     );
+  }
+
+  Padding buildSectionProductView() {
+    final productList =
+        searchResponseProvider.searchResponse?.data?.products?.results;
+    return productList!.isNotEmpty
+        ? Padding(
+            padding:
+                const EdgeInsets.only(left: 17, right: 17, top: 8, bottom: 8),
+            child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 300,
+                  mainAxisSpacing: 5,
+                  crossAxisSpacing: 10),
+              itemCount: productList!.length,
+              itemBuilder: (context, index) {
+                return ProductItemView(
+                  item: productList[index],
+                );
+              },
+            ),
+          )
+        : const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Center(
+              child: Text(
+                "Data Not Found",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+          );
   }
 
   SizedBox buildSectionSearchBar(BuildContext context) {
@@ -75,17 +108,24 @@ class _SearchPageState extends State<SearchPage> {
               height: 48,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                color: Color(0xFFFFFFFF),
+                color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Padding(
                 padding: const EdgeInsets.only(left: 24, right: 12),
                 child: TextField(
+                  controller: _searchController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: "কাঙ্ক্ষিত পণ্যটি খুঁজুন",
                     suffixIcon: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          searchResponseProvider
+                              .setSearchData(_searchController.text);
+                          setState(() {
+                            hasDataSearched = true;
+                          });
+                        },
                         icon: const Icon(Icons.search_rounded)),
                   ),
                 ),
