@@ -1,9 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.find_product">
+    <uses-permission android:name="android.permission.INTERNET permission"></uses-permission>
    <application
-        android:label="find_product"
+        android:label="Find Product"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
