@@ -52,7 +52,9 @@ To run the app, simply write
 **API:** REST API
 
 
+## Figma Design Link
 
+[click here](https://www.figma.com/file/rDAWS96kl0TCxbzcMUtaPn/Flutter-Task-File-(Copy)?node-id=0%3A1&t=OBpNmXw8glk7vMwU-1)
 
 ## API Documentation
 #### Search API
