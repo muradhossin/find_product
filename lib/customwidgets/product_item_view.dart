@@ -21,7 +21,7 @@ class _ProductItemViewState extends State<ProductItemView> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: (){
-        Navigator.pushNamed(context, ProductDetailsPage.routeName);
+        Navigator.pushNamed(context, ProductDetailsPage.routeName, arguments: widget.item);
       },
       child: Stack(children: [
         Container(
@@ -81,7 +81,7 @@ class _ProductItemViewState extends State<ProductItemView> {
                           children: [
                             TextSpan(
                                 text:
-                                    "$takaSymbol ${widget.item!.charge!.currentCharge}",
+                                    "$takaSymbol ${widget.item!.charge!.currentCharge!.toStringAsFixed(2)}",
                                 style: const TextStyle(
                                     color: Color(0xFFDA2079),
                                     fontSize: 16,
@@ -89,7 +89,7 @@ class _ProductItemViewState extends State<ProductItemView> {
                           ]),
                     ),
                     Text(
-                      "$takaSymbol${widget.item!.charge!.currentCharge! + 200}",
+                      "$takaSymbol${(widget.item!.charge!.currentCharge! + 200).toStringAsFixed(2)}",
                       style: const TextStyle(
                           color: Color(0xFFDA2079),
                           fontSize: 12,
@@ -112,7 +112,7 @@ class _ProductItemViewState extends State<ProductItemView> {
                           children: [
                             TextSpan(
                                 text:
-                                    "$takaSymbol ${widget.item!.charge!.sellingPrice}",
+                                    "$takaSymbol ${widget.item!.charge!.sellingPrice!.toStringAsFixed(2)}",
                                 style: const TextStyle(
                                     color: Color(0xFF646464),
                                     fontSize: 12,
@@ -128,7 +128,7 @@ class _ProductItemViewState extends State<ProductItemView> {
                               fontWeight: FontWeight.w400),
                           children: [
                             TextSpan(
-                                text: "$takaSymbol${widget.item!.charge!.profit}",
+                                text: "$takaSymbol${widget.item!.charge!.profit!.toStringAsFixed(2)}",
                                 style: const TextStyle(
                                     color: Color(0xFF646464),
                                     fontSize: 12,

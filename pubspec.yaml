@@ -41,6 +41,11 @@ dependencies:
   google_fonts: ^4.0.3
   google_language_fonts: ^2.0.0
   cached_network_image:
+  carousel_slider: ^4.2.1
+  dotted_line: ^3.1.0
+  flutter_html: ^2.2.1
+
+
 
 dev_dependencies:
   flutter_test:
