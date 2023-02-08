@@ -20,8 +20,9 @@ class _ProductItemViewState extends State<ProductItemView> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (){
-        Navigator.pushNamed(context, ProductDetailsPage.routeName, arguments: widget.item);
+      onTap: () {
+        Navigator.pushNamed(context, ProductDetailsPage.routeName,
+            arguments: widget.item);
       },
       child: Stack(children: [
         Container(
@@ -30,6 +31,28 @@ class _ProductItemViewState extends State<ProductItemView> {
               color: const Color(0xFFFFFFFF),
               borderRadius: BorderRadius.circular(15)),
         ),
+        if (widget.item!.stock! <= 0)
+          Positioned(
+            top: 10,
+            right: 8,
+            child: Container(
+              height: 20,
+              width: 70,
+              decoration: BoxDecoration(
+                color: Color(0xFFFFCCCC),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: const Text(
+                "স্টকে নেই",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFFC62828),
+                ),
+              ),
+            ),
+          ),
         Positioned(
           top: 12,
           left: 38,
@@ -91,9 +114,9 @@ class _ProductItemViewState extends State<ProductItemView> {
                     Text(
                       "$takaSymbol${(widget.item!.charge!.currentCharge! + 200).toStringAsFixed(2)}",
                       style: const TextStyle(
-                          color: Color(0xFFDA2079),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                        color: Color(0xFFDA2079),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                         decoration: TextDecoration.lineThrough,
                       ),
                     )
@@ -128,7 +151,8 @@ class _ProductItemViewState extends State<ProductItemView> {
                               fontWeight: FontWeight.w400),
                           children: [
                             TextSpan(
-                                text: "$takaSymbol${widget.item!.charge!.profit!.toStringAsFixed(2)}",
+                               text:
+                                    "$takaSymbol${widget.item.charge!.profit?.toStringAsFixed(2)}",
                                 style: const TextStyle(
                                     color: Color(0xFF646464),
                                     fontSize: 12,
@@ -138,6 +162,24 @@ class _ProductItemViewState extends State<ProductItemView> {
                   ],
                 ),
               ],
+            ),
+          ),
+        ),
+        if(widget.item!.stock! > 0) Positioned(
+          top: 245,
+          left: 50,
+          right: 50,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color:  Color(0xFF6210E1),
+            ),
+            child: const Center(
+              child: Text("+", textAlign: TextAlign.center,style: TextStyle(
+                fontSize: 24, color: Color(0xFFFFFFFF), fontWeight: FontWeight.w400
+              ),),
             ),
           ),
         ),
