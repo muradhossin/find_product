@@ -19,18 +19,38 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   late SearchResponseProvider searchResponseProvider;
   final TextEditingController _searchController = TextEditingController();
+  late ScrollController _controller;
+
+  bool isDataCalledOnce = true;
   bool hasDataSearched = false;
+  int offsetNumber = 10;
+  int limitNumber = 10;
+
+  bool _hasNextPage = true;
+  bool _isLoadMoreRunning = false;
+
+  @override
+  void initState() {
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
-    searchResponseProvider =
-        Provider.of<SearchResponseProvider>(context, listen: true);
+    if (isDataCalledOnce) {
+      searchResponseProvider =
+          Provider.of<SearchResponseProvider>(context, listen: true);
+    }
+    isDataCalledOnce = false;
+
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -39,6 +59,7 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E5E5),
       body: SingleChildScrollView(
+        controller: _controller,
         child: Column(
           children: [
             buildSectionSearchBar(context),
@@ -58,40 +79,58 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Padding buildSectionProductView() {
+  Column buildSectionProductView() {
     final productList =
         searchResponseProvider.searchResponse?.data?.products?.results;
-    return productList!.isNotEmpty
-        ? Padding(
-            padding:
-                const EdgeInsets.only(left: 17, right: 17, top: 8, bottom: 8),
-            child: GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisExtent: 300,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 10),
-              itemCount: productList!.length,
-              itemBuilder: (context, index) {
-                return ProductItemView(
-                  item: productList[index],
-                );
-              },
-            ),
-          )
-        : const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Center(
+    return Column(
+      children: [
+        productList!.isNotEmpty
+            ? Padding(
+                padding: const EdgeInsets.only(
+                    left: 17, right: 17, top: 8, bottom: 8),
+                child: GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisExtent: 300,
+                      mainAxisSpacing: 5,
+                      crossAxisSpacing: 10),
+                  itemCount: productList!.length,
+                  itemBuilder: (context, index) {
+                    return ProductItemView(
+                      item: productList[index],
+                    );
+                  },
+                ),
+              )
+            : const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    "Data Not Found",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+        if (_isLoadMoreRunning == true)
+          const Center(
+            child: CircularProgressIndicator(),
+          ),
+        if (_hasNextPage == false)
+          Container(
+            padding: const EdgeInsets.only(top: 5, bottom: 5),
+            child: const Center(
               child: Text(
-                "Data Not Found",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                'No more data available',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ),
-          );
+          ),
+      ],
+    );
   }
 
   SizedBox buildSectionSearchBar(BuildContext context) {
@@ -122,6 +161,7 @@ class _SearchPageState extends State<SearchPage> {
                         onPressed: () {
                           searchResponseProvider
                               .setSearchData(_searchController.text);
+
                           setState(() {
                             hasDataSearched = true;
                           });
@@ -136,4 +176,28 @@ class _SearchPageState extends State<SearchPage> {
       ),
     );
   }
+
+  void _scrollListener() async {
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      setState(() {
+        _isLoadMoreRunning = true;
+      });
+
+      offsetNumber += 10;
+      limitNumber += 10;
+      if (offsetNumber <=
+          searchResponseProvider.searchResponse!.data!.products!.count!) {
+        await searchResponseProvider.setOffset(offsetNumber, limitNumber);
+      }
+      offsetNumber -= 10;
+      limitNumber -= 10;
+      setState(() {
+        _isLoadMoreRunning = false;
+        _hasNextPage = false;
+      });
+    }
+
+  }
+
 }
