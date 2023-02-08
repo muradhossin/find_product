@@ -1,4 +1,6 @@
+import 'package:find_product/customwidgets/search_bar_view.dart';
 import 'package:find_product/models/search_response.dart';
+import 'package:find_product/pages/product_details_page.dart';
 import 'package:find_product/providers/search_response_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_language_fonts/google_language_fonts.dart';
@@ -20,6 +22,8 @@ class _SearchPageState extends State<SearchPage> {
   late SearchResponseProvider searchResponseProvider;
   final TextEditingController _searchController = TextEditingController();
   late ScrollController _controller;
+  bool isTextShowing = true;
+
 
   bool isDataCalledOnce = true;
   bool hasDataSearched = false;
@@ -28,6 +32,7 @@ class _SearchPageState extends State<SearchPage> {
 
   bool _hasNextPage = true;
   bool _isLoadMoreRunning = false;
+
 
   @override
   void initState() {
@@ -43,6 +48,14 @@ class _SearchPageState extends State<SearchPage> {
           Provider.of<SearchResponseProvider>(context, listen: true);
     }
     isDataCalledOnce = false;
+
+    final searchProduct = ModalRoute.of(context)!.settings.arguments;
+    if(searchProduct != null){
+      if(isTextShowing){
+        _searchController.text = searchProduct.toString();
+      }
+
+    }
 
     super.didChangeDependencies();
   }
@@ -159,6 +172,7 @@ class _SearchPageState extends State<SearchPage> {
                     hintText: "কাঙ্ক্ষিত পণ্যটি খুঁজুন",
                     suffixIcon: IconButton(
                         onPressed: () {
+
                           searchResponseProvider
                               .setSearchData(_searchController.text);
 
@@ -168,6 +182,15 @@ class _SearchPageState extends State<SearchPage> {
                         },
                         icon: const Icon(Icons.search_rounded)),
                   ),
+                  onTap: (){
+
+                    setState(() {
+                      isTextShowing = false;
+                      _searchController.clear();
+
+                    });
+
+                  },
                 ),
               ),
             ),
@@ -197,7 +220,5 @@ class _SearchPageState extends State<SearchPage> {
         _hasNextPage = false;
       });
     }
-
   }
-
 }
